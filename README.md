@@ -10,6 +10,10 @@ This project provides a test suite for the OWASP Juice Shop. The test suite cove
 4. The login form returns an error message in case of an invalid user password combination.
 5. Successful login using valid Credentials
 
+## Security Tests
+
+   Added security tests to demonstrate vulnerabilities such as XSS and SQL Injection.
+
 ## Prerequisites
 
 - Docker
@@ -39,6 +43,12 @@ This project provides a test suite for the OWASP Juice Shop. The test suite cove
 
    **Note:** On macOS and Windows, if you are using Docker Machine instead of the native Docker installation, browse to http://192.168.99.100:3000.
 
+## Clone the git repository
+
+   ```sh
+   git clone https://github.com/ak-arsalan/OWASP-Juice-Shop-Automation.git
+   ```
+
 ## Create Virtual Environment
 
    ```sh
@@ -67,4 +77,18 @@ pip install -r requirements.txt
    
    ```sh
    pytest -s
+   ```
+
+# Clean up
+
+1. **Stop the Docker container:**
+
+   ```sh
+   docker stop $(docker ps -q --filter ancestor=bkimminich/juice-shop)
+   ```
+
+2. **Remove unused Docker resources:**
+
+   ```sh
+   docker system prune -af
    ```
