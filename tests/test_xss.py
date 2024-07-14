@@ -2,13 +2,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def test_sql_injection(driver):
-    driver.get("http://localhost:3000/#/login") 
+def test_sql_injection(driver, base_url, xss_script):
+    driver.get(f"{base_url}/#/login") 
 
     email_input = driver.find_element(By.ID, "email")
     password_input = driver.find_element(By.ID, "password")
 
-    email_input.send_keys("<script>alert('XSS')</script>")
+    email_input.send_keys(xss_script)
     password_input.send_keys("admin")
     
     login_button = driver.find_element(By.ID, "loginButton")
