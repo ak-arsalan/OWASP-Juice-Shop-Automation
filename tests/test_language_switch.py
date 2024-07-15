@@ -3,10 +3,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 def test_language_switch(driver):
-    
-    WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, "//*[text()='Dismiss']")))
-    driver.find_element(By.XPATH, "//*[text()='Dismiss']").click()
 
     WebDriverWait(driver, 10).until(
     EC.element_to_be_clickable((By.XPATH, "//*[text()=' language ']")))
