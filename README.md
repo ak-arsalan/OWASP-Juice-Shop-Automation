@@ -14,10 +14,6 @@ This project provides a test suite for the OWASP Juice Shop. The test suite cove
 
    Added security tests to demonstrate vulnerabilities such as XSS and SQL Injection.
 
-## Github Action flow
-
-   Added security tests to demonstrate vulnerabilities such as XSS and SQL Injection.
-
 ## Test Results:
 ![Pytest-Results](./results.png)
 
