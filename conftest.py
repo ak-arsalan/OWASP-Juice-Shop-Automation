@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 import os
 import pytest
 from selenium import webdriver
@@ -7,8 +6,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-load_dotenv()
 
 @pytest.fixture(scope="session")
 def base_url():
