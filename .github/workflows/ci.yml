@@ -35,7 +35,7 @@ jobs:
 
       - name: Install Playwright Browsers
         run: |
-          python -m playwright install
+          python -m playwright install --with-deps
 
       - name: Build and run Juice Shop Docker container
         run: |
