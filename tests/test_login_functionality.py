@@ -1,74 +1,66 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from playwright.sync_api import expect
 
+def test_login(setup, base_url):
+    page = setup
+    page.goto(f"{base_url}/#/login")
+    expect(page).to_have_title("OWASP Juice Shop")
 
-def test_login(driver, base_url):
-    driver.get(f"{base_url}/#/login")
-    assert driver.title == "OWASP Juice Shop"
+    login_heading_element = page.locator("h1", has_text="Login")
+    expect(login_heading_element).to_be_visible()
+    assert login_heading_element.inner_text() == "Login", "'Login' heading text is incorrect"
 
-    dismiss_buttons = driver.find_elements(By.XPATH, "//*[text()='Dismiss']")
-    if dismiss_buttons:
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[text()='Dismiss']"))
-        ).click()
+def test_initial_state_login_button_disabled(setup, base_url):
+    page = setup
+    page.goto(f"{base_url}/#/login")
 
-    login_heading_element = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.XPATH, "//*[text() = 'Login']")))
-    assert login_heading_element is not None, "'Login heading' is not present"
+    login_button = page.locator("xpath=//button[@disabled = 'true']")
+    assert login_button.is_visible(), "Login button should be disabled initially"
 
-def test_initial_state_login_button_disabled(driver, base_url):
-    driver.get(f"{base_url}/#/login")  
+def test_empty_fields_button_disabled(setup, base_url):
+    page = setup
+    page.goto(f"{base_url}/#/login")
 
-    login_button = driver.find_element(By.ID, "loginButton")
-    assert not login_button.is_enabled(), "Login button should be disabled initially"
+    email_input = page.locator("#email")
+    password_input = page.locator("#password")
 
-def test_empty_fields_button_disabled(driver, base_url):
-    driver.get(f"{base_url}/#/login")
+    email_input.fill("")
+    password_input.fill("")
 
-    email_input = driver.find_element(By.ID, "email")
-    password_input = driver.find_element(By.ID, "password")
+    login_button = page.locator("xpath=//button[@disabled = 'true']")
+    assert login_button.is_visible(), "Login button should be disabled initially"
 
-    email_input.send_keys("")
-    password_input.send_keys("")
+def test_invalid_credentials(setup, base_url, invalid_email, invalid_password):
+    page = setup
+    page.goto(f"{base_url}/#/login")
 
-    login_button = driver.find_element(By.ID, "loginButton")
-    assert not login_button.is_enabled(), "Login button should be disabled with empty fields"
+    email_input = page.locator("#email")
+    password_input = page.locator("#password")
 
-def test_invalid_credentials(driver, base_url, invalid_email, invalid_password):
-    driver.get(f"{base_url}/#/login") 
+    email_input.fill(invalid_email)
+    password_input.fill(invalid_password)
 
-    email_input = driver.find_element(By.ID, "email")
-    password_input = driver.find_element(By.ID, "password")
-
-    email_input.send_keys(invalid_email)
-    password_input.send_keys(invalid_password)
-
-    login_button = driver.find_element(By.ID, "loginButton")
-
-    assert login_button.is_enabled(), "Login button should be enabled with incorrect credentials"
-    login_button.click()
-
-    error_message = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.XPATH, "//*[text() = 'Invalid email or password.']")))
-    assert error_message is not None, "'Error validation' is not present"
-
-def test_valid_credentials_successful_login(driver, base_url, email, password):
-    driver.refresh()
-    driver.get(f"{base_url}/#/login") 
-
-    email_input = driver.find_element(By.ID, "email")
-    password_input = driver.find_element(By.ID, "password")
-
-    email_input.send_keys(email)
-    password_input.send_keys(password)
-    
-    login_button = driver.find_element(By.ID, "loginButton")
-    assert login_button.is_enabled(), "Login button should be enabled with correct credentials"
+    login_button = page.wait_for_selector("#loginButton")
+    assert login_button.is_enabled(), "Login button should be enabled"
 
     login_button.click()
-    
-    successfully_login = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.XPATH, "//*[text() = ' Your Basket']")))
-    assert successfully_login is not None, "'Cart' is not present"
 
+    error_message = page.wait_for_selector("xpath=//div[@class='error ng-star-inserted' and text()='Invalid email or password.']", timeout=10000)
+    assert error_message.is_visible(), "Error message 'Invalid email or password.' is not visible"
+
+def test_valid_credentials_successful_login(setup, base_url, email, password):
+    page = setup
+    page.goto(f"{base_url}/#/login")
+
+    email_input = page.locator("#email")
+    password_input = page.locator("#password")
+
+    email_input.fill(email)
+    password_input.fill(password)
+
+    login_button = page.wait_for_selector("#loginButton")
+    assert login_button.is_enabled(), "Login button should be enabled"
+
+    login_button.click()
+
+    your_basket_span = page.wait_for_selector("xpath=//span[text()=' Your Basket']", timeout=10000)
+    assert your_basket_span.is_visible(), "'Your Basket' span is not visible"
