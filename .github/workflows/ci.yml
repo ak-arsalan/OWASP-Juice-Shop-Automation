@@ -3,8 +3,8 @@ name: OWASP-Juice-Shop-Automation | Playwright Tests
 on:
   push:
     branches:
-      - main
       - dev
+      - main
 
 jobs:
   test:
@@ -32,6 +32,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Install Playwright Browsers
+        run: |
+          python -m playwright install
 
       - name: Build and run Juice Shop Docker container
         run: |
