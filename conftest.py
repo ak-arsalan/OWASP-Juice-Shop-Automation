@@ -1,40 +1,40 @@
-from dotenv import load_dotenv
 import os
 import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from playwright.sync_api import sync_playwright, Page, expect
 
+@pytest.fixture(scope="session")
+def playwright():
+    with sync_playwright() as p:
+        yield p
 
-load_dotenv()
+@pytest.fixture(scope="session")
+def api_context(playwright):
+    request_context = playwright.request.new_context()
+    yield request_context
+    request_context.dispose()
 
 @pytest.fixture(scope="session")
 def base_url():
     return "http://localhost:3000"
 
-@pytest.fixture(scope="module")
-def driver(base_url):
+@pytest.fixture(scope="function", params=["chromium", "firefox", "webkit", "edge"])
+def page(request, playwright):
+    browser_type = request.param
+    if browser_type == "edge":
+        browser = playwright.chromium.launch(headless=True, channel="msedge")
+    else:
+        browser = getattr(playwright, browser_type).launch(headless=True)
+    page = browser.new_page()
+    yield page
+    browser.close()
 
-    options = Options()
-    options.add_argument("--headless")  # Run Chrome in headless mode
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    
-    driver = webdriver.Chrome(options=options)
-    driver.maximize_window()
-    driver.get(base_url)
-
-    dismiss_buttons = driver.find_elements(By.XPATH, "//*[text()='Dismiss']")
-    if dismiss_buttons:
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[text()='Dismiss']"))
-        ).click()
-
-    yield driver
-    driver.quit()
+@pytest.fixture(scope="function")
+def setup(page: Page, base_url: str):
+    page.goto(base_url)
+    dismiss_buttons = page.locator("text='Dismiss'")
+    if dismiss_buttons.count():
+        dismiss_buttons.click()
+    yield page
 
 @pytest.fixture(scope="session")
 def invalid_email():

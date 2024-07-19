@@ -1,10 +1,10 @@
-# OWASP Juice Shop Test Suite
+# OWASP Juice Shop Test Suite with Playwright
 
 ## Description
 
 This project provides a test suite for the OWASP Juice Shop. The test suite covers the following functionalities:
 
-1. Pagination functionality to show different items per page.
+1. Pagination functionality to show different items per page via API.
 2. Changing the amount of items per page lists the correct amount of items.
 3. Changing the language 
 4. The login form returns an error message in case of an invalid user password combination.
@@ -14,7 +14,11 @@ This project provides a test suite for the OWASP Juice Shop. The test suite cove
 
    Added security tests to demonstrate vulnerabilities such as XSS and SQL Injection.
 
-## Test Results:
+## Test Coverage
+
+   Playwright browsers : ["chromium", "firefox", "webkit", "edge"]
+
+## Test Results
 ![Pytest-Results](./results.png)
 
 ## Prerequisites
